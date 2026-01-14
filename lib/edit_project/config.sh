@@ -8,8 +8,8 @@ load_config() {
     source "$EDIT_PROJECT_CONFIG_PATH"
 }
 
-write_config() {
-}
+# write_config() {
+# }
 
 prompt_config() {
     local reconfigure="${EDIT_PROJECT_OVERWRITE_CONFIG:-"false"}"

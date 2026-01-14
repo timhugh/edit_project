@@ -1,7 +1,7 @@
 .PHONY: test
 test:
 	@echo "Running tests..."
-	# Add your test commands here
+	./test/bats/bin/bats test/*_test.sh
 
 .PHONY: install
 install:
