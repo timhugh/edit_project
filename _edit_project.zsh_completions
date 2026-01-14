@@ -1,0 +1,40 @@
+#compdef edit_project open_project
+
+RED_TEXT='\e[31m'
+YELLOW_TEXT='\e[33m'
+GREEN_TEXT='\e[32m'
+DEFAULT_TEXT='\e[0m'
+
+ERROR="${RED_TEXT}[ERROR]${DEFAULT_TEXT}"
+WARNING="${YELLOW_TEXT}[WARNING]${DEFAULT_TEXT}"
+
+EDIT_PROJECT_SCRIPT="${HOME}/.local/share/edit_project.sh"
+EDIT_PROJECT_CONFIG="${HOME}/.config/edit_project.conf"
+
+_edit_project() {
+    # only complete the first argument
+    [[ $CURRENT -gt 2 ]] && return 0
+
+    # load configuration and validate
+    [[ ! -f "$EDIT_PROJECT_CONFIG" ]] && echo "configuration file not found at ${EDIT_PROJECT_CONFIG}" >&2 && return 1
+    source "${HOME}/.config/edit_project.conf" 2>/dev/null || true
+    [[ -z "$root_dir" ]] && echo "configuration is incomplete! root_dir is not set" >&2 && return 1
+    [[ ! -d "$root_dir" ]] && echo "root_dir does not exist" >&2 && return 1
+
+    local cur="${words[CURRENT]}"
+
+    local fzf_flags=(
+        --query="$cur"
+        --preview "${HOME}/.local/share/_edit_project_preview.sh \"{}\" \"${root_dir}\""
+        --bind "start:reload:${HOME}/.local/share/_edit_project_list_options.sh \"${cur}\""
+        --bind "change:reload:${HOME}/.local/share/_edit_project_list_options.sh \"${cur}\""
+        --select-1
+        --exit-0
+        --reverse
+        --ansi
+    )
+
+    local selected=$(fzf "${fzf_flags[@]}")
+
+    [[ -n "$selected" ]] && compadd -U "$selected"
+}
