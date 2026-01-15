@@ -5,9 +5,12 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/timhugh/edit_project"
+	"github.com/timhugh/edit_project/cli"
 )
 
 var configPath string
+var stdout = cli.NewOutput(os.Stdout)
+var stderr = cli.NewOutput(os.Stderr)
 
 func main() {
 	err := rootCmd.Execute()
