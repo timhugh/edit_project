@@ -9,15 +9,15 @@ import (
 var DefaultConfigPath = os.ExpandEnv("$HOME/.config/edit_project/config.json")
 
 type Config struct {
-	WorkspaceDirectory string `json:"workspace_directory"`
-	GitUsername     string `json:"git_username"`
+	Workspaces []string `json:"workspaces"`
+	GitUsers []string `json:"git_users"`
 	Editor       string `json:"editor"`
 }
 
 func DefaultConfig() Config {
 	return Config{
-		WorkspaceDirectory: "~/git",
-		GitUsername:     "",
+		Workspaces: []string{"~/git"},
+		GitUsers: []string{},
 		Editor:       "nvim",
 	}
 }
@@ -38,7 +38,7 @@ func LoadConfig(path string) (Config, error) {
 	return config, nil
 }
 
-func SaveConfig(path string, config Config) error {
+func SaveConfig(path string, config *Config) error {
 	err := os.MkdirAll(filepath.Dir(path), 0755)
 	if err != nil {
 		return err

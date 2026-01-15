@@ -1,5 +1,11 @@
 {
-	"workspace_directory": "~/my_workspace",
-	"git_username": "my_username",
+	"workspaces": [
+		"~/projects",
+		"~/work"
+	],
+	"git_users": [
+		"my_git_user",
+		"my_work_org"
+	],
 	"editor": "emacs"
 }
