@@ -14,6 +14,10 @@ type Config struct {
 	Editor     string   `json:"editor"`
 }
 
+func (c *Config) EditorFullPath() (string, error) {
+	return PathToExecutable(c.Editor)
+}
+
 func DefaultConfig() Config {
 	return Config{
 		Workspaces: []string{"~/git"},

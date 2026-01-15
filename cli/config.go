@@ -5,28 +5,57 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"syscall"
 
-	"github.com/hairyhenderson/go-which"
 	"github.com/timhugh/edit_project"
 )
 
-func ConfigCreate(out *Output, configPath string) error {
-	// We don't care if this fails because there probably isn't a config file yet
-	// and we'll at least get the default values
-	config, _ := edit_project.LoadConfig(configPath)
-
-	if err := edit_project.SaveConfig(configPath, &config); err != nil {
-		return err
+func loadConfigOrDefault(configPath string) (edit_project.Config, error) {
+	config, err := edit_project.LoadConfig(configPath)
+	if err != nil {
+		if errors.Is(err, os.ErrNotExist) {
+			return edit_project.DefaultConfig(), nil
+		}
+		return edit_project.Config{}, fmt.Errorf("failed to load configuration: %w", err)
 	}
+	return config, nil
+}
 
+func saveConfig(out *Output, configPath string, config *edit_project.Config, confirm bool) error {
+	if confirm {
+		jsonOutput, err := json.MarshalIndent(config, "", "  ")
+		if err != nil {
+			return fmt.Errorf("failed to marshal configuration: %w", err)
+		}
+		out.Printf("Configuration to be written to %s:\n", configPath)
+		out.Println(string(jsonOutput))
+		shouldContinue, err := confirmPrompt(out, "Continue?", false)
+		if err != nil {
+			return err
+		}
+		if !shouldContinue {
+			out.Println("Aborting.")
+			return nil
+		}
+	}
+	if err := edit_project.SaveConfig(configPath, config); err != nil {
+		return fmt.Errorf("failed to write configuration to file %s: %w", configPath, err)
+	}
 	jsonOutput, err := json.MarshalIndent(config, "", "  ")
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to marshal configuration: %w", err)
 	}
 	out.Println("Configuration written to", configPath)
 	out.Println(string(jsonOutput))
 	return nil
+}
+
+func ConfigCreate(out *Output, configPath string) error {
+	config, err := loadConfigOrDefault(configPath)
+	if err != nil {
+		return err
+	}
+
+	return saveConfig(out, configPath, &config, true)
 }
 
 func ConfigEdit(out *Output, configPath string) error {
@@ -36,18 +65,11 @@ func ConfigEdit(out *Output, configPath string) error {
 			return fmt.Errorf("failed to load configuration: %w", err)
 		}
 		out.Println("Configuration file does not exist; creating with default values.")
-		if err := edit_project.SaveConfig(configPath, &config); err != nil {
+		if err := saveConfig(out, configPath, &config, false); err != nil {
 			return fmt.Errorf("failed to write default configuration: %w", err)
 		}
 	}
-	pathToEditor := which.Which(config.Editor)
-	command := []string{config.Editor, configPath}
-	env := os.Environ()
-	out.Println("Opening configuration file in editor:", pathToEditor)
-	if err := syscall.Exec(pathToEditor, command, env); err != nil {
-		return fmt.Errorf("failed to open editor: %w", err)
-	}
-	return nil
+	return edit_project.OpenEditor(config, configPath)
 }
 
 func ConfigPath(out *Output, configPath string) error {
@@ -57,24 +79,7 @@ func ConfigPath(out *Output, configPath string) error {
 
 func ConfigReset(out *Output, configPath string) error {
 	defaultConfig := edit_project.DefaultConfig()
-	jsonOutput, err := json.MarshalIndent(defaultConfig, "", "  ")
-	if err != nil {
-		return fmt.Errorf("failed to marshal default configuration: %w", err)
-	}
-	out.Printf("Configuration file %s will be reset to default values\n:", configPath)
-	out.Println(string(jsonOutput))
-	out.Printf("Continue? (y/N): ")
-	var response string
-	_, err = fmt.Scanln(&response)
-	if err != nil || (response != "y" && response != "Y") {
-		out.Println("Aborting.")
-		return nil
-	}
-	if err := edit_project.SaveConfig(configPath, &defaultConfig); err != nil {
-		return fmt.Errorf("failed to write configuration to file %s: %w", configPath, err)
-	}
-	out.Println("Configuration reset")
-	return nil
+	return saveConfig(out, configPath, &defaultConfig, true)
 }
 
 func ConfigShow(out *Output, configPath string) error {
