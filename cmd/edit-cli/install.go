@@ -1,9 +1,9 @@
 package main
 
 import (
-	"os"
 	"github.com/spf13/cobra"
 	"github.com/timhugh/edit_project"
+	"os"
 )
 
 var installCmd = &cobra.Command{

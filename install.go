@@ -1,9 +1,9 @@
 package edit_project
 
 import (
+	_ "embed"
 	"fmt"
 	"io"
-	_ "embed"
 )
 
 //go:embed install.bash
@@ -15,10 +15,14 @@ var zshInstall string
 func Install(shell string, w io.Writer) error {
 	switch shell {
 	case "bash":
-		fmt.Fprintln(w, bashInstall)
+		if _, err := fmt.Fprintln(w, bashInstall); err != nil {
+			return err
+		}
 		return nil
 	case "zsh":
-		fmt.Fprintln(w, zshInstall)
+		if _, err := fmt.Fprintln(w, zshInstall); err != nil {
+			return err
+		}
 		return nil
 	default:
 		return fmt.Errorf("unsupported shell type: %s", shell)

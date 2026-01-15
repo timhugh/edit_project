@@ -29,8 +29,8 @@ func TestLoadConfig(t *testing.T) {
 		}
 		if diff := deep.Equal(config, edit_project.Config{
 			Workspaces: []string{"~/projects", "~/work"},
-			GitUsers:       []string{"my_git_user", "my_work_org"},
-			Editor:            "emacs",
+			GitUsers:   []string{"my_git_user", "my_work_org"},
+			Editor:     "emacs",
 		}); diff != nil {
 			t.Errorf("loaded config does not match expected: %v", diff)
 		}
@@ -44,8 +44,8 @@ func TestLoadConfig(t *testing.T) {
 		}
 		if diff := deep.Equal(config, edit_project.Config{
 			Workspaces: defaultConfig.Workspaces,
-			GitUsers:       []string{"my_git_user"},
-			Editor:            defaultConfig.Editor,
+			GitUsers:   []string{"my_git_user"},
+			Editor:     defaultConfig.Editor,
 		}); diff != nil {
 			t.Errorf("loaded config does not match expected: %v", diff)
 		}
@@ -71,8 +71,8 @@ func TestSaveConfig(t *testing.T) {
 
 		writtenConfig := &edit_project.Config{
 			Workspaces: []string{"~/my_projects"},
-			GitUsers:       []string{"user1", "user2"},
-			Editor:            "code",
+			GitUsers:   []string{"user1", "user2"},
+			Editor:     "code",
 		}
 		err = edit_project.SaveConfig(file.Name(), writtenConfig)
 		if err != nil {
