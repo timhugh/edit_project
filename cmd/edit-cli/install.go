@@ -3,26 +3,25 @@ package main
 import (
 	"github.com/spf13/cobra"
 	"github.com/timhugh/edit_project/cli"
-	"os"
 )
 
 var installCmd = &cobra.Command{
-	Use:   "install",
+	Use:   "install [shell]",
 	Short: "Install the edit CLI tool",
-	Run: func(cmd *cobra.Command, args []string) {
-		shell, err := cmd.Flags().GetString("shell")
-		if err != nil {
-			stderr.Println("Error reading shell flag:", err)
-			os.Exit(1)
-		}
-		if err := cli.Install(stdout, shell); err != nil {
-			stderr.Println("Failed to install edit-cli tool:", err)
-			os.Exit(1)
-		}
+	Long: `Outputs the shell code to install the edit_project and open_project commands for the specified shell.
+
+Example usage:
+
+	edit-cli install bash >> ~/.bashrc
+	edit-cli install zsh >> ~/.zshrc`,
+
+	Args: cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		shell := args[0]
+		return cli.Install(stdout, shell)
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(installCmd)
-	installCmd.Flags().StringP("shell", "s", "bash", "Specify the shell type (e.g., bash, zsh)")
 }
