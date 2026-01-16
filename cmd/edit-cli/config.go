@@ -34,6 +34,17 @@ var configEditCmd = &cobra.Command{
 	},
 }
 
+var configEditorPathCmd = &cobra.Command{
+	Use:   "editor-path",
+	Short: "Show the path to the configured editor",
+	Run: func(cmd *cobra.Command, args []string) {
+		if err := cli.ConfigEditorPath(stdout, configPath); err != nil {
+			stderr.Println("Error getting editor path:", err)
+			os.Exit(1)
+		}
+	},
+}
+
 var configPathCmd = &cobra.Command{
 	Use:   "path",
 	Short: "Show the path to the configuration file",
@@ -71,6 +82,7 @@ func init() {
 	rootCmd.AddCommand(configCmd)
 	configCmd.AddCommand(configCreateCmd)
 	configCmd.AddCommand(configEditCmd)
+	configCmd.AddCommand(configEditorPathCmd)
 	configCmd.AddCommand(configPathCmd)
 	configCmd.AddCommand(configShowCmd)
 	configCmd.AddCommand(configResetCmd)

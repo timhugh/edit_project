@@ -13,7 +13,7 @@ import (
 func TestDefaultConfig(t *testing.T) {
 	config := edit_project.DefaultConfig()
 	if diff := deep.Equal(config, edit_project.Config{
-		Workspaces: []string{"~/git"},
+		Workspaces: []edit_project.WorkspaceConfig{{Path: "~/git", UserPrefixes: true} },
 		GitUsers:   []string{},
 		Editor:     "nvim",
 	}); diff != nil {
@@ -28,7 +28,10 @@ func TestLoadConfig(t *testing.T) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 		if diff := deep.Equal(config, edit_project.Config{
-			Workspaces: []string{"~/projects", "~/work"},
+			Workspaces: []edit_project.WorkspaceConfig{
+				{Path: "~/projects", UserPrefixes: true},
+				{Path: "~/work", UserPrefixes: false},
+			},
 			GitUsers:   []string{"my_git_user", "my_work_org"},
 			Editor:     "emacs",
 		}); diff != nil {
@@ -70,7 +73,9 @@ func TestSaveConfig(t *testing.T) {
 		}
 
 		writtenConfig := &edit_project.Config{
-			Workspaces: []string{"~/my_projects"},
+			Workspaces: []edit_project.WorkspaceConfig{
+				{Path: "~/my_projects", UserPrefixes: true},
+			},
 			GitUsers:   []string{"user1", "user2"},
 			Editor:     "code",
 		}

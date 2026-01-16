@@ -9,9 +9,14 @@ import (
 var DefaultConfigPath = os.ExpandEnv("$HOME/.config/edit_project/config.json")
 
 type Config struct {
-	Workspaces []string `json:"workspaces"`
+	Workspaces []WorkspaceConfig `json:"workspaces"`
 	GitUsers   []string `json:"git_users"`
 	Editor     string   `json:"editor"`
+}
+
+type WorkspaceConfig struct {
+	Path string `json:"path"`
+	UserPrefixes bool `json:"user_prefixes"`
 }
 
 func (c *Config) EditorFullPath() (string, error) {
@@ -20,7 +25,12 @@ func (c *Config) EditorFullPath() (string, error) {
 
 func DefaultConfig() Config {
 	return Config{
-		Workspaces: []string{"~/git"},
+		Workspaces: []WorkspaceConfig{
+			{
+				Path: "~/git",
+				UserPrefixes: true,
+			},
+		},
 		GitUsers:   []string{},
 		Editor:     "nvim",
 	}

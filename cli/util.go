@@ -20,9 +20,9 @@ func prompt(out *Output, message string) (string, error) {
 func confirmPrompt(out *Output, message string, defaultYes bool) (bool, error) {
 	var fullMessage string
 	if defaultYes {
-		fullMessage = fmt.Sprintf("%s (Y/n): ", message)
+		fullMessage = fmt.Sprintf("%s (Y/n)", message)
 	} else {
-		fullMessage = fmt.Sprintf("%s (y/N): ", message)
+		fullMessage = fmt.Sprintf("%s (y/N)", message)
 	}
 
 	response, err := prompt(out, fullMessage)
@@ -31,14 +31,14 @@ func confirmPrompt(out *Output, message string, defaultYes bool) (bool, error) {
 	}
 
 	if defaultYes {
-		if response != "y" && response != "Y" {
-			return true, nil
-		}
-		return false, nil
-	} else {
-		if response != "n" && response != "N" {
+		if response != "y" && response != "Y" && response != "" {
 			return false, nil
 		}
 		return true, nil
+	} else {
+		if response != "n" && response != "N" && response != "" {
+			return true, nil
+		}
+		return false, nil
 	}
 }

@@ -1,7 +1,7 @@
 {
 	"workspaces": [
-		"~/projects",
-		"~/work"
+		{ "path": "~/projects", "user_prefixes": true },
+		{ "path": "~/work", "user_prefixes": false }
 	],
 	"git_users": [
 		"my_git_user",

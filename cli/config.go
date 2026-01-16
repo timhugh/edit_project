@@ -72,6 +72,19 @@ func ConfigEdit(out *Output, configPath string) error {
 	return edit_project.OpenEditor(config, configPath)
 }
 
+func ConfigEditorPath(out *Output, configPath string) error {
+	config, err := edit_project.LoadConfig(configPath)
+	if err != nil {
+		return fmt.Errorf("failed to load configuration: %w", err)
+	}
+	editorPath, err := config.EditorFullPath()
+	if err != nil {
+		return fmt.Errorf("failed to get editor path: %w", err)
+	}
+	out.Println(editorPath)
+	return nil
+}
+
 func ConfigPath(out *Output, configPath string) error {
 	out.Println(configPath)
 	return nil
