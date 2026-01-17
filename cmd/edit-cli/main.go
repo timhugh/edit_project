@@ -24,6 +24,15 @@ var rootCmd = &cobra.Command{
 	Short: "Quickly open projects in your editor",
 }
 
+var versionCmd = &cobra.Command{
+	Use:   "version",
+	Short: "Show the current version of edit-cli",
+	Run: func(cmd *cobra.Command, args []string) {
+		stdout.Printf("edit-cli version %s", edit_project.Version)
+	},
+}
+
 func init() {
+	rootCmd.AddCommand(versionCmd)
 	rootCmd.PersistentFlags().StringVar(&configPath, "config", edit_project.DefaultConfigPath, "Path to configuration file")
 }
