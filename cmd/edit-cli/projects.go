@@ -40,8 +40,27 @@ var projectsListCmd = &cobra.Command{
 	},
 }
 
+var projectsSearchCmd = &cobra.Command{
+	Use:   "search",
+	Short: "Search for projects",
+	Args:  cobra.MaximumNArgs(1),
+	Run: func(cmd *cobra.Command, args []string) {
+		var query string
+		if len(args) > 0 {
+			query = args[0]
+		}
+
+		err := cli.ProjectsSearch(stdout, configPath, query)
+		if err != nil {
+			stderr.Println("Error searching projects:", err)
+			os.Exit(1)
+		}
+	},
+}
+
 func init() {
 	rootCmd.AddCommand(projectsCommand)
 	projectsCommand.AddCommand(projectsListCmd)
 	projectsListCmd.Flags().String("format", "list", "Output format: list, json")
+	projectsCommand.AddCommand(projectsSearchCmd)
 }
