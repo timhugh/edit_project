@@ -6,6 +6,13 @@ import (
 	"github.com/timhugh/edit_project"
 )
 
+type OutputFormat string
+
+const (
+	FormatList OutputFormat = "list"
+	FormatJSON OutputFormat = "json"
+)
+
 func getAllProjects(configPath string) ([]edit_project.Project, error) {
 	config, err := edit_project.LoadConfig(configPath)
 	if err != nil {
@@ -18,21 +25,23 @@ func getAllProjects(configPath string) ([]edit_project.Project, error) {
 	return projects, nil
 }
 
-func ProjectsList(out *Output, configPath string, format string) error {
+func ProjectsList(out *Output, configPath string, format OutputFormat) error {
 	projects, err := getAllProjects(configPath)
 	if err != nil {
 		return err
 	}
 
 	switch format {
-	case "JSON":
+	case FormatJSON:
 		jsonOutput, err := json.MarshalIndent(projects, "", "  ")
 		if err != nil {
 			return fmt.Errorf("failed to marshal projects to JSON: %w", err)
 		}
 		out.Println(string(jsonOutput))
 	default:
-		return fmt.Errorf("unsupported format: %s", format)
+		for _, project := range projects {
+			out.Println(project.AbsPath)
+		}
 	}
 
 	return nil

@@ -12,19 +12,36 @@ var projectsCommand = &cobra.Command{
 	Short: "Interact with project directories",
 }
 
+func parseFormat(format string) cli.OutputFormat {
+	switch format {
+	case "json":
+		return cli.FormatJSON
+	default:
+		return cli.FormatList
+	}
+}
+
 var projectsListCmd = &cobra.Command{
 	Use:   "list",
 	Short: "List all projects in configured workspaces",
-	Run: func(cmd *cobra.Command, args []string) {
-		// TODO: add arg for output format
-		if err := cli.ProjectsList(stdout, configPath, "JSON"); err != nil {
+	RunE: func(cmd *cobra.Command, args []string) error {
+		formatArg, err := cmd.Flags().GetString("format")
+		if err != nil {
+			return err
+		}
+
+		format := parseFormat(formatArg)
+
+		if err := cli.ProjectsList(stdout, configPath, format); err != nil {
 			stderr.Println("Error listing projects:", err)
 			os.Exit(1)
 		}
+		return nil
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(projectsCommand)
 	projectsCommand.AddCommand(projectsListCmd)
+	projectsListCmd.Flags().String("format", "list", "Output format: list, json")
 }
