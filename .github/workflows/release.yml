@@ -52,29 +52,29 @@ jobs:
       - uses: actions/setup-go@v6
         with:
           go-version: '1.25.5'
-      - name: read version file
-        id: read_version
-        run: echo "VERSION=$(cat VERSION)" >> $GITHUB_ENV
       - env:
-          VERSION: ${{ env.VERSION }}
           GOOS: ${{ matrix.os }}
           GOARCH: ${{ matrix.arch }}
-        run: go build ./cmd/edit-cli
+        run: |
+          mkdir -p dist
+          go build -o ./dist/edit-cli ./cmd/edit-cli
       - run: |
           case "${{ matrix.package_format }}" in
             tar.gz)
-              tar -czf edit_project-${{ matrix.os }}-${{ matrix.arch }}.tar.gz ./edit-cli
+              tar -C ./dist -czf edit_project-${{ matrix.os }}-${{ matrix.arch }}.${{ matrix.package_format }} ./edit-cli
               ;;
             zip)
-              zip edit_project-${{ matrix.os }}-${{ matrix.arch }}.zip ./edit-cli
+              cd ./dist
+              zip ./edit_project-${{ matrix.os }}-${{ matrix.arch }}.${{ matrix.package_format }} ./edit-cli
               ;;
           esac
       - run: ls -la
+      - run: ls -la dist
       - name: upload artifact
         uses: actions/upload-artifact@v6
         with:
           name: ${{ matrix.os }}-${{ matrix.arch }}-${{ matrix.package_format }}
-          path: edit_project-${{ matrix.os }}-${{ matrix.arch }}.${{ matrix.package_format }}
+          path: dist/edit_project-${{ matrix.os }}-${{ matrix.arch }}.${{ matrix.package_format }}
 
   release:
     runs-on: ubuntu-latest
@@ -88,7 +88,8 @@ jobs:
       - uses: actions/download-artifact@v7
         with:
           path: dist
-      - run: ls -la 
+      - run: ls -la
+      - run: ls -la dist
       # TODO: official release is deprecated, migrate to another action or use gh cli
       - uses: actions/create-release@v1
         with:
