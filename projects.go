@@ -36,7 +36,11 @@ func ListProjectsInWorkspace(workspace string, includeUserPrefix bool) ([]Projec
 			return nil, err
 		}
 
-		if !info.IsDir() || strings.HasPrefix(filepath.Base(dir), ".") {
+		// ignore non-directories and hidden directories
+		// TODO: the dot checks are pretty naive and the second one could pick up false positives
+		if !info.IsDir() ||
+			strings.HasPrefix(filepath.Base(dir), ".") ||
+			strings.Contains(dir, "/.") {
 			continue
 		}
 		
