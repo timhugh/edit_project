@@ -35,7 +35,7 @@ jobs:
       - run: go test ./...
 
   build:
-    name: Build and package ${{ matrix.os }}-${{ matrix.arch }}
+    name: Build and package ${{ matrix.os }}-${{ matrix.arch }}.${{ matrix.package_format }}
     needs: test
     runs-on: ubuntu-latest
     strategy:
@@ -62,7 +62,7 @@ jobs:
           GOARCH: ${{ matrix.arch }}
         run: |
           mkdir -p dist
-          output="edit-cli-${{ matrix.os }}-${{ matrix.arch }}"
+          output="edit_project-${{ matrix.os }}-${{ matrix.arch }}"
           if [ "${{ matrix.os }}" = "windows" ]; then
             output="${output}.exe"
           fi
@@ -72,17 +72,17 @@ jobs:
           cd dist
           case "${{ matrix.package_format }}" in
             tar.gz)
-              tar -czf edit-cli-${{ matrix.os }}-${{ matrix.arch }}.tar.gz edit-cli-${{ matrix.os }}-${{ matrix.arch }}
+              tar -czf edit_project-${{ matrix.os }}-${{ matrix.arch }}.tar.gz edit_project-${{ matrix.os }}-${{ matrix.arch }}
               ;;
             zip)
-              zip edit-cli-${{ matrix.os }}-${{ matrix.arch }}.zip edit-cli-${{ matrix.os }}-${{ matrix.arch }}
+              zip edit_project-${{ matrix.os }}-${{ matrix.arch }}.zip edit_project-${{ matrix.os }}-${{ matrix.arch }}
               ;;
           esac
       - name: upload artifact
         uses: actions/upload-artifact@v6
         with:
-          name: edit-cli-${{ matrix.os }}-${{ matrix.arch }}.${{ matrix.package_format }}
-          path: dist/edit-cli-${{ matrix.os }}-${{ matrix.arch }}.${{ matrix.package_format }}
+          name: edit_project-${{ matrix.os }}-${{ matrix.arch }}.${{ matrix.package_format }}
+          path: dist/edit_project-${{ matrix.os }}-${{ matrix.arch }}.${{ matrix.package_format }}
 
   release:
     runs-on: ubuntu-latest
