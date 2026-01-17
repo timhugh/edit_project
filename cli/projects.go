@@ -7,11 +7,18 @@ import (
 	"github.com/timhugh/edit_project"
 )
 
-type OutputFormat string
+type PathOutput int
 
 const (
-	FormatList OutputFormat = "list"
-	FormatJSON OutputFormat = "json"
+	AbsolutePathOutput PathOutput = iota
+	RelativePathOutput PathOutput = iota
+)
+
+type OutputFormat int
+
+const (
+	FormatList OutputFormat = iota
+	FormatJSON OutputFormat = iota
 )
 
 func getAllProjects(configPath string) ([]edit_project.Project, error) {
@@ -26,7 +33,7 @@ func getAllProjects(configPath string) ([]edit_project.Project, error) {
 	return projects, nil
 }
 
-func ProjectsList(out *Output, configPath string, format OutputFormat) error {
+func ProjectsList(out *Output, configPath string, format OutputFormat, pathOutput PathOutput) error {
 	projects, err := getAllProjects(configPath)
 	if err != nil {
 		return err
@@ -41,7 +48,11 @@ func ProjectsList(out *Output, configPath string, format OutputFormat) error {
 		out.Println(string(jsonOutput))
 	default:
 		for _, project := range projects {
-			out.Println(project.AbsPath)
+			if pathOutput == RelativePathOutput {
+				out.Println(project.RelPath)
+			} else {
+				out.Println(project.AbsPath)
+			}
 		}
 	}
 

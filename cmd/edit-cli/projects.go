@@ -12,7 +12,8 @@ var projectsCommand = &cobra.Command{
 	Short: "Interact with project directories",
 }
 
-func parseFormat(format string) cli.OutputFormat {
+func parseFormat(cmd *cobra.Command) cli.OutputFormat {
+	format, _ := cmd.Flags().GetString("format")
 	switch format {
 	case "json":
 		return cli.FormatJSON
@@ -21,18 +22,22 @@ func parseFormat(format string) cli.OutputFormat {
 	}
 }
 
+func parsePathOutput(cmd *cobra.Command) cli.PathOutput {
+	relative, _ := cmd.Flags().GetBool("relative")
+	if relative {
+		return cli.RelativePathOutput
+	}
+	return cli.AbsolutePathOutput
+}
+
 var projectsListCmd = &cobra.Command{
 	Use:   "list",
 	Short: "List all projects in configured workspaces",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		formatArg, err := cmd.Flags().GetString("format")
-		if err != nil {
-			return err
-		}
+		format := parseFormat(cmd)
+		pathOutput := parsePathOutput(cmd)
 
-		format := parseFormat(formatArg)
-
-		if err := cli.ProjectsList(stdout, configPath, format); err != nil {
+		if err := cli.ProjectsList(stdout, configPath, format, pathOutput); err != nil {
 			stderr.Println("Error listing projects:", err)
 			os.Exit(1)
 		}
@@ -62,5 +67,6 @@ func init() {
 	rootCmd.AddCommand(projectsCommand)
 	projectsCommand.AddCommand(projectsListCmd)
 	projectsListCmd.Flags().String("format", "list", "Output format: list, json")
+	projectsListCmd.Flags().Bool("relative", false, "Show relative paths (absolute paths are shown by default)")
 	projectsCommand.AddCommand(projectsSearchCmd)
 }
