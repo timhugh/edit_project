@@ -5,6 +5,7 @@ go 1.25.5
 require (
 	github.com/go-test/deep v1.1.1
 	github.com/hairyhenderson/go-which v0.2.2
+	github.com/junegunn/fzf v0.67.0
 	github.com/spf13/cobra v1.10.2
 )
 
@@ -13,7 +14,6 @@ require (
 	github.com/gdamore/encoding v1.0.1 // indirect
 	github.com/gdamore/tcell/v2 v2.9.0 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
-	github.com/junegunn/fzf v0.67.0 // indirect
 	github.com/junegunn/go-shellwords v0.0.0-20250127100254-2aa3b3277741 // indirect
 	github.com/lucasb-eyer/go-colorful v1.2.0 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
