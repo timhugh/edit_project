@@ -67,6 +67,7 @@ jobs:
             output="${output}.exe"
           fi
           go build -o dist/"${output}" ./cmd/edit-cli
+      - run: ls -la dist
       - name: package binary
         run: |
           cd dist
@@ -78,6 +79,7 @@ jobs:
               zip edit_project-${{ matrix.os }}-${{ matrix.arch }}.zip edit_project-${{ matrix.os }}-${{ matrix.arch }}
               ;;
           esac
+      - run: ls -la dist
       - name: upload artifact
         uses: actions/upload-artifact@v6
         with:
@@ -96,6 +98,8 @@ jobs:
       - uses: actions/download-artifact@v7
         with:
           path: dist
+      - run: ls -la dist
+      - run: ls -la dist/*
       # TODO: official release is deprecated, migrate to another action or use gh cli
       - uses: actions/create-release@v1
         with:
