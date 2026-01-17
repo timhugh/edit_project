@@ -18,6 +18,13 @@ jobs:
             echo "Tag $TAG does not match VERSION file ($VERSION)"
             exit 1
           fi
+      - run: |
+          VERSION=$(cat VERSION)
+          exists=$(gh release list --json tagName --jq ".[] | select(.tagName == \"$VERSION\")")
+          if [ -n "$exists" ]; then
+            echo "Release with tag $VERSION already exists"
+            exit 1
+          fi
 
   test:
     name: Test on ${{ matrix.os }}
