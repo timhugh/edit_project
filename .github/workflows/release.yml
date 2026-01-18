@@ -12,6 +12,8 @@ jobs:
   validate-version:
     name: Validate version tag
     runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
     steps:
       - uses: actions/checkout@v6
       - run: ci/validate_version.sh ${TAG}
@@ -74,3 +76,5 @@ jobs:
         with:
           path: dist
       - run: ci/release.sh ${TAG}
+        env:
+          GH_TOKEN: ${{ github.token }}
