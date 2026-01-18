@@ -1,8 +1,8 @@
-package edit_project_test
+package core_test
 
 import (
 	_ "embed"
-	"github.com/timhugh/edit_project"
+	"github.com/timhugh/edit_project/internal/core"
 	"strings"
 	"testing"
 )
@@ -27,7 +27,7 @@ func TestInstall(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.Shell, func(t *testing.T) {
 			w := &strings.Builder{}
-			err := edit_project.Install(tt.Shell, w)
+			err := core.Install(tt.Shell, w)
 			if tt.ExpectError {
 				if err == nil {
 					t.Fatalf("expected error for unsupported shell, got nil")

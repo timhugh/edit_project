@@ -4,7 +4,7 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
-	"github.com/timhugh/edit_project/cli"
+	"github.com/timhugh/edit_project/internal/cli"
 )
 
 var configCmd = &cobra.Command{

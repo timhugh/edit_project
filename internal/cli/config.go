@@ -6,21 +6,21 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/timhugh/edit_project"
+	"github.com/timhugh/edit_project/internal/core"
 )
 
-func loadConfigOrDefault(configPath string) (edit_project.Config, error) {
-	config, err := edit_project.LoadConfig(configPath)
+func loadConfigOrDefault(configPath string) (core.Config, error) {
+	config, err := core.LoadConfig(configPath)
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) {
-			return edit_project.DefaultConfig(), nil
+			return core.DefaultConfig(), nil
 		}
-		return edit_project.Config{}, fmt.Errorf("failed to load configuration: %w", err)
+		return core.Config{}, fmt.Errorf("failed to load configuration: %w", err)
 	}
 	return config, nil
 }
 
-func saveConfig(out *Output, configPath string, config *edit_project.Config, confirm bool) error {
+func saveConfig(out *Output, configPath string, config *core.Config, confirm bool) error {
 	if confirm {
 		jsonOutput, err := json.MarshalIndent(config, "", "  ")
 		if err != nil {
@@ -37,7 +37,7 @@ func saveConfig(out *Output, configPath string, config *edit_project.Config, con
 			return nil
 		}
 	}
-	if err := edit_project.SaveConfig(configPath, config); err != nil {
+	if err := core.SaveConfig(configPath, config); err != nil {
 		return fmt.Errorf("failed to write configuration to file %s: %w", configPath, err)
 	}
 	jsonOutput, err := json.MarshalIndent(config, "", "  ")
@@ -59,7 +59,7 @@ func ConfigCreate(out *Output, configPath string) error {
 }
 
 func ConfigEdit(out *Output, configPath string) error {
-	config, err := edit_project.LoadConfig(configPath)
+	config, err := core.LoadConfig(configPath)
 	if err != nil {
 		if !errors.Is(err, os.ErrNotExist) {
 			return fmt.Errorf("failed to load configuration: %w", err)
@@ -69,11 +69,11 @@ func ConfigEdit(out *Output, configPath string) error {
 			return fmt.Errorf("failed to write default configuration: %w", err)
 		}
 	}
-	return edit_project.OpenEditor(config, configPath)
+	return core.OpenEditor(config, configPath)
 }
 
 func ConfigEditorPath(out *Output, configPath string) error {
-	config, err := edit_project.LoadConfig(configPath)
+	config, err := core.LoadConfig(configPath)
 	if err != nil {
 		return fmt.Errorf("failed to load configuration: %w", err)
 	}
@@ -91,12 +91,12 @@ func ConfigPath(out *Output, configPath string) error {
 }
 
 func ConfigReset(out *Output, configPath string) error {
-	defaultConfig := edit_project.DefaultConfig()
+	defaultConfig := core.DefaultConfig()
 	return saveConfig(out, configPath, &defaultConfig, true)
 }
 
 func ConfigShow(out *Output, configPath string) error {
-	config, err := edit_project.LoadConfig(configPath)
+	config, err := core.LoadConfig(configPath)
 	if err != nil && !errors.Is(err, os.ErrNotExist) {
 		return fmt.Errorf("failed to load configuration: %w", err)
 	}

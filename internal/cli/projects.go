@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	fzf "github.com/junegunn/fzf/src"
-	"github.com/timhugh/edit_project"
+	"github.com/timhugh/edit_project/internal/core"
 )
 
 type PathOutput int
@@ -21,12 +21,12 @@ const (
 	FormatJSON OutputFormat = iota
 )
 
-func getAllProjects(configPath string) ([]edit_project.Project, error) {
-	config, err := edit_project.LoadConfig(configPath)
+func getAllProjects(configPath string) ([]core.Project, error) {
+	config, err := core.LoadConfig(configPath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to load configuration: %w", err)
 	}
-	projects, err := edit_project.ListAllProjects(&config)
+	projects, err := core.ListAllProjects(&config)
 	if err != nil {
 		return nil, fmt.Errorf("failed to list projects: %w", err)
 	}

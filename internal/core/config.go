@@ -1,4 +1,4 @@
-package edit_project
+package core
 
 import (
 	"encoding/json"

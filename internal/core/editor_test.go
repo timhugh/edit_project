@@ -1,14 +1,14 @@
-package edit_project_test
+package core_test
 
 import (
 	"testing"
 
-	"github.com/timhugh/edit_project"
+	"github.com/timhugh/edit_project/internal/core"
 )
 
 func TestPathToExecutable(t *testing.T) {
 	t.Run("returns path if found", func(t *testing.T) {
-		path, err := edit_project.PathToExecutable("go")
+		path, err := core.PathToExecutable("go")
 		if err != nil {
 			t.Fatalf("expected no error, got %v", err)
 		}
@@ -18,7 +18,7 @@ func TestPathToExecutable(t *testing.T) {
 	})
 
 	t.Run("returns error if not found", func(t *testing.T) {
-		_, err := edit_project.PathToExecutable("nonexistent_executable_12345")
+		_, err := core.PathToExecutable("nonexistent_executable_12345")
 		if err == nil {
 			t.Fatalf("expected an error, got nil")
 		}
