@@ -75,7 +75,7 @@ jobs:
       - uses: actions/download-artifact@v7
         with:
           path: dist
-      - run: ls -laR dist
+          merge-multiple: true
       - run: ci/release.sh ${TAG}
         env:
           GH_TOKEN: ${{ github.token }}
