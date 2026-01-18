@@ -50,18 +50,17 @@ jobs:
       OS: ${{ matrix.os }}
       ARCH: ${{ matrix.arch }}
       PACKAGE_FORMAT: ${{ matrix.package_format }}
-      OUTPUT: ${{ matrix.target }}-${{ matrix.os }}-${{ matrix.arch }}.${{ matrix.package_format }}
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-go@v6
         with:
           go-version: '1.25.5'
-        run: ci/package.sh ./cmd/${{ TARGET }}
+      - run: ci/package.sh ./cmd/${{ TARGET }}
       - name: upload artifact
         uses: actions/upload-artifact@v6
         with:
-          name: ${{ OUTPUT }}
-          path: dist/${{ OUTPUT }}
+          name: ${{ matrix.target }}-${{ matrix.os }}-${{ matrix.arch }}.${{ matrix.package_format }}
+          path: dist/${{ matrix.target }}-${{ matrix.os }}-${{ matrix.arch }}.${{ matrix.package_format }}
 
   release:
     runs-on: ubuntu-latest
