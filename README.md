@@ -61,7 +61,6 @@ Again, fzf opens with a list of all of the projects I have pre-filtered with the
 - `edit-cli create` will write a config file (by default `~/.config/edit_project/config.json`)
 - `edit-cli show` will print your current configuration
 - `edit-cli edit` will open your config file in your configured editor (admittedly a bit chicken and egg if you haven't configured an editor yet)
-[//]: # (TODO: when $EDITOR fallback is added, update that last bullet)
 
 The most basic configuration (which is the default) anticipates you having a workspace folder (~/git by default) that contains projects/repos organized by user/repo, like:
 
