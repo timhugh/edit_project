@@ -67,15 +67,13 @@ func ProjectsSearch(out *Output, configPath string, query string) error {
 
 	inputChan := make(chan string)
 	outputChan := make(chan string)
-	// probably can use default options but leaving this here for now
-	// also not handling errors since we're not parsing anything
-	options, _ := fzf.ParseOptions(
-		true,
-		[]string{},
-	)
+
+	// not handling errors since we're not parsing anything
+	options, _ := fzf.ParseOptions(true, []string{})
 	options.Input = inputChan
 	options.Output = outputChan
 	options.Query = query
+	options.Exit0 = true
 
 	go func() {
 		for _, project := range projects {
