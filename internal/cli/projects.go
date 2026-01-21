@@ -74,6 +74,10 @@ func ProjectsSearch(out *Output, configPath string, query string) error {
 	options.Output = outputChan
 	options.Query = query
 	options.Exit0 = true
+	options.Select1 = true
+
+	complete := make(chan bool)
+	defer close(complete)
 
 	go func() {
 		for _, project := range projects {
@@ -88,6 +92,7 @@ func ProjectsSearch(out *Output, configPath string, query string) error {
 					out.Println(project.AbsPath)
 				}
 			}
+			complete <- true
 		}
 	}()
 
@@ -95,5 +100,8 @@ func ProjectsSearch(out *Output, configPath string, query string) error {
 		return fmt.Errorf("fzf search failed: %w", err)
 	}
 
+	// with options.Select1, fzf.Run() seems to return before outputChan gets a chance to be read.
+	// this ensures we wait for that to complete.
+	<-complete
 	return nil
 }
