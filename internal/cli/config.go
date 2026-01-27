@@ -6,23 +6,24 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/timhugh/edit_project/internal/config"
 	"github.com/timhugh/edit_project/internal/core"
 )
 
-func loadConfigOrDefault(configPath string) (core.Config, error) {
-	config, err := core.LoadConfig(configPath)
+func loadConfigOrDefault(configPath string) (config.Config, error) {
+	cfg, err := config.Load(configPath)
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) {
-			return core.DefaultConfig(), nil
+			return config.Default(), nil
 		}
-		return core.Config{}, fmt.Errorf("failed to load configuration: %w", err)
+		return config.Config{}, fmt.Errorf("failed to load configuration: %w", err)
 	}
-	return config, nil
+	return cfg, nil
 }
 
-func saveConfig(out *Output, configPath string, config *core.Config, confirm bool) error {
+func saveConfig(out *Output, configPath string, cfg *config.Config, confirm bool) error {
 	if confirm {
-		jsonOutput, err := json.MarshalIndent(config, "", "  ")
+		jsonOutput, err := json.MarshalIndent(cfg, "", "  ")
 		if err != nil {
 			return fmt.Errorf("failed to marshal configuration: %w", err)
 		}
@@ -37,10 +38,10 @@ func saveConfig(out *Output, configPath string, config *core.Config, confirm boo
 			return nil
 		}
 	}
-	if err := core.SaveConfig(configPath, config); err != nil {
+	if err := config.Save(configPath, cfg); err != nil {
 		return fmt.Errorf("failed to write configuration to file %s: %w", configPath, err)
 	}
-	jsonOutput, err := json.MarshalIndent(config, "", "  ")
+	jsonOutput, err := json.MarshalIndent(cfg, "", "  ")
 	if err != nil {
 		return fmt.Errorf("failed to marshal configuration: %w", err)
 	}
@@ -50,34 +51,34 @@ func saveConfig(out *Output, configPath string, config *core.Config, confirm boo
 }
 
 func ConfigCreate(out *Output, configPath string) error {
-	config, err := loadConfigOrDefault(configPath)
+	cfg, err := loadConfigOrDefault(configPath)
 	if err != nil {
 		return err
 	}
 
-	return saveConfig(out, configPath, &config, true)
+	return saveConfig(out, configPath, &cfg, true)
 }
 
 func ConfigEdit(out *Output, configPath string) error {
-	config, err := core.LoadConfig(configPath)
+	cfg, err := config.Load(configPath)
 	if err != nil {
 		if !errors.Is(err, os.ErrNotExist) {
 			return fmt.Errorf("failed to load configuration: %w", err)
 		}
 		out.Println("Configuration file does not exist; creating with default values.")
-		if err := saveConfig(out, configPath, &config, false); err != nil {
+		if err := saveConfig(out, configPath, &cfg, false); err != nil {
 			return fmt.Errorf("failed to write default configuration: %w", err)
 		}
 	}
-	return core.OpenEditor(config, configPath)
+	return core.OpenEditor(cfg, configPath)
 }
 
 func ConfigEditorPath(out *Output, configPath string) error {
-	config, err := core.LoadConfig(configPath)
+	cfg, err := config.Load(configPath)
 	if err != nil {
 		return fmt.Errorf("failed to load configuration: %w", err)
 	}
-	editorPath, err := config.EditorFullPath()
+	editorPath, err := cfg.EditorFullPath()
 	if err != nil {
 		return fmt.Errorf("failed to get editor path: %w", err)
 	}
@@ -91,16 +92,16 @@ func ConfigPath(out *Output, configPath string) error {
 }
 
 func ConfigReset(out *Output, configPath string) error {
-	defaultConfig := core.DefaultConfig()
+	defaultConfig := config.Default()
 	return saveConfig(out, configPath, &defaultConfig, true)
 }
 
 func ConfigShow(out *Output, configPath string) error {
-	config, err := core.LoadConfig(configPath)
+	cfg, err := config.Load(configPath)
 	if err != nil && !errors.Is(err, os.ErrNotExist) {
 		return fmt.Errorf("failed to load configuration: %w", err)
 	}
-	jsonOutput, err := json.MarshalIndent(config, "", "  ")
+	jsonOutput, err := json.MarshalIndent(cfg, "", "  ")
 	if err != nil {
 		return fmt.Errorf("failed to marshal configuration: %w", err)
 	}

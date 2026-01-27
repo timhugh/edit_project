@@ -3,7 +3,9 @@ package cli
 import (
 	"encoding/json"
 	"fmt"
+
 	fzf "github.com/junegunn/fzf/src"
+	"github.com/timhugh/edit_project/internal/config"
 	"github.com/timhugh/edit_project/internal/core"
 )
 
@@ -22,11 +24,11 @@ const (
 )
 
 func getAllProjects(configPath string) ([]core.Project, error) {
-	config, err := core.LoadConfig(configPath)
+	cfg, err := config.Load(configPath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to load configuration: %w", err)
 	}
-	projects, err := core.ListAllProjects(&config)
+	projects, err := core.ListAllProjects(&cfg)
 	if err != nil {
 		return nil, fmt.Errorf("failed to list projects: %w", err)
 	}

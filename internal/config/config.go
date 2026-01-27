@@ -1,43 +1,45 @@
-package core
+package config
 
 import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+
+	"github.com/timhugh/edit_project/internal/util"
 )
 
-var DefaultConfigPath = os.ExpandEnv("$HOME/.config/edit_project/config.json")
+var DefaultPath = os.ExpandEnv("$HOME/.config/edit_project/config.json")
 
 type Config struct {
 	Workspaces []WorkspaceConfig `json:"workspaces"`
-	GitUsers   []string `json:"git_users"`
-	Editor     string   `json:"editor"`
+	GitUsers   []string          `json:"git_users"`
+	Editor     string            `json:"editor"`
 }
 
 type WorkspaceConfig struct {
-	Path string `json:"path"`
-	UserPrefixes bool `json:"user_prefixes"`
+	Path         string `json:"path"`
+	UserPrefixes bool   `json:"user_prefixes"`
 }
 
 func (c *Config) EditorFullPath() (string, error) {
-	return PathToExecutable(c.Editor)
+	return util.PathToExecutable(c.Editor)
 }
 
-func DefaultConfig() Config {
+func Default() Config {
 	return Config{
 		Workspaces: []WorkspaceConfig{
 			{
-				Path: "~/git",
+				Path:         "~/git",
 				UserPrefixes: true,
 			},
 		},
-		GitUsers:   []string{},
-		Editor:     "nvim",
+		GitUsers: []string{},
+		Editor:   "nvim",
 	}
 }
 
-func LoadConfig(path string) (Config, error) {
-	config := DefaultConfig()
+func Load(path string) (Config, error) {
+	config := Default()
 	file, err := os.Open(path)
 	if err != nil {
 		return config, err
@@ -52,7 +54,7 @@ func LoadConfig(path string) (Config, error) {
 	return config, nil
 }
 
-func SaveConfig(path string, config *Config) error {
+func Save(path string, config *Config) error {
 	err := os.MkdirAll(filepath.Dir(path), 0755)
 	if err != nil {
 		return err

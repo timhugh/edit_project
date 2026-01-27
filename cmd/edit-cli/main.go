@@ -5,8 +5,8 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/timhugh/edit_project"
-	"github.com/timhugh/edit_project/internal/core"
 	"github.com/timhugh/edit_project/internal/cli"
+	"github.com/timhugh/edit_project/internal/config"
 )
 
 var configPath string
@@ -35,5 +35,5 @@ var versionCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(versionCmd)
-	rootCmd.PersistentFlags().StringVar(&configPath, "config", core.DefaultConfigPath, "Path to configuration file")
+	rootCmd.PersistentFlags().StringVar(&configPath, "config", config.DefaultPath, "Path to configuration file")
 }

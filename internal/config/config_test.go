@@ -1,4 +1,4 @@
-package core_test
+package config_test
 
 import (
 	"encoding/json"
@@ -7,13 +7,13 @@ import (
 	"testing"
 
 	"github.com/go-test/deep"
-	"github.com/timhugh/edit_project/internal/core"
+	"github.com/timhugh/edit_project/internal/config"
 )
 
 func TestDefaultConfig(t *testing.T) {
-	config := core.DefaultConfig()
-	if diff := deep.Equal(config, core.Config{
-		Workspaces: []core.WorkspaceConfig{{Path: "~/git", UserPrefixes: true} },
+	cfg := config.Default()
+	if diff := deep.Equal(cfg, config.Config{
+		Workspaces: []config.WorkspaceConfig{{Path: "~/git", UserPrefixes: true}},
 		GitUsers:   []string{},
 		Editor:     "nvim",
 	}); diff != nil {
@@ -23,29 +23,29 @@ func TestDefaultConfig(t *testing.T) {
 
 func TestLoadConfig(t *testing.T) {
 	t.Run("valid config file populates config", func(t *testing.T) {
-		config, err := core.LoadConfig("testdata/full_config.json")
+		cfg, err := config.Load("testdata/full_config.json")
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
-		if diff := deep.Equal(config, core.Config{
-			Workspaces: []core.WorkspaceConfig{
+		if diff := deep.Equal(cfg, config.Config{
+			Workspaces: []config.WorkspaceConfig{
 				{Path: "~/projects", UserPrefixes: true},
 				{Path: "~/work", UserPrefixes: false},
 			},
-			GitUsers:   []string{"my_git_user", "my_work_org"},
-			Editor:     "emacs",
+			GitUsers: []string{"my_git_user", "my_work_org"},
+			Editor:   "emacs",
 		}); diff != nil {
 			t.Errorf("loaded config does not match expected: %v", diff)
 		}
 	})
 
 	t.Run("partial config file uses defaults for missing values", func(t *testing.T) {
-		defaultConfig := core.DefaultConfig()
-		config, err := core.LoadConfig("testdata/partial_config.json")
+		defaultConfig := config.Default()
+		cfg, err := config.Load("testdata/partial_config.json")
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
-		if diff := deep.Equal(config, core.Config{
+		if diff := deep.Equal(cfg, config.Config{
 			Workspaces: defaultConfig.Workspaces,
 			GitUsers:   []string{"my_git_user"},
 			Editor:     defaultConfig.Editor,
@@ -55,7 +55,7 @@ func TestLoadConfig(t *testing.T) {
 	})
 
 	t.Run("non-existent config file returns expected error", func(t *testing.T) {
-		_, err := core.LoadConfig("testdata/non_existent.json")
+		_, err := config.Load("testdata/non_existent.json")
 		if err == nil {
 			t.Fatalf("expected error for non-existent file, got nil")
 		}
@@ -72,14 +72,14 @@ func TestSaveConfig(t *testing.T) {
 			t.Fatalf("unexpected error creating temp file: %v", err)
 		}
 
-		writtenConfig := &core.Config{
-			Workspaces: []core.WorkspaceConfig{
+		writtenConfig := &config.Config{
+			Workspaces: []config.WorkspaceConfig{
 				{Path: "~/my_projects", UserPrefixes: true},
 			},
-			GitUsers:   []string{"user1", "user2"},
-			Editor:     "code",
+			GitUsers: []string{"user1", "user2"},
+			Editor:   "code",
 		}
-		err = core.SaveConfig(file.Name(), writtenConfig)
+		err = config.Save(file.Name(), writtenConfig)
 		if err != nil {
 			t.Fatalf("unexpected error saving config: %v", err)
 		}
@@ -88,7 +88,7 @@ func TestSaveConfig(t *testing.T) {
 		if err != nil {
 			t.Fatalf("unexpected error reading config file: %v", err)
 		}
-		var readConfig core.Config
+		var readConfig config.Config
 		err = json.Unmarshal(readConfigRaw, &readConfig)
 		if err != nil {
 			t.Fatalf("unexpected error unmarshaling config: %v", err)

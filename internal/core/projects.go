@@ -4,16 +4,19 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/timhugh/edit_project/internal/config"
+	"github.com/timhugh/edit_project/internal/util"
 )
 
 type Project struct {
 	Workspace string
-	AbsPath  string
-	RelPath  string
+	AbsPath   string
+	RelPath   string
 }
 
 func ListProjectsInWorkspace(workspace string, includeUserPrefix bool) ([]Project, error) {
-	fullDir, err := expandTildePath(workspace)
+	fullDir, err := util.ExpandTildePath(workspace)
 	if err != nil {
 		return nil, err
 	}
@@ -43,10 +46,10 @@ func ListProjectsInWorkspace(workspace string, includeUserPrefix bool) ([]Projec
 			strings.Contains(dir, "/.") {
 			continue
 		}
-		
+
 		project := Project{
 			Workspace: workspace,
-			AbsPath:  dir,
+			AbsPath:   dir,
 		}
 		relPath, err := filepath.Rel(fullDir, dir)
 		if err != nil {
@@ -64,9 +67,9 @@ func ListProjectsInWorkspace(workspace string, includeUserPrefix bool) ([]Projec
 	return projects, nil
 }
 
-func ListAllProjects(config *Config) ([]Project, error) {
+func ListAllProjects(cfg *config.Config) ([]Project, error) {
 	var projects []Project
-	for _, workspace := range config.Workspaces {
+	for _, workspace := range cfg.Workspaces {
 		workspaceProjects, err := ListProjectsInWorkspace(workspace.Path, workspace.UserPrefixes)
 		if err != nil {
 			return nil, err
